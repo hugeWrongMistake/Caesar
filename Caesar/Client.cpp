@@ -6,8 +6,9 @@ extern Config config;
 CGlobalsVars g_pGlobals;
 SCREENINFO g_Screen;
 
-void AntiSnapshot() { g_pGlobals.bSnapshot = true; }
-void AntiScreenshot() { g_pGlobals.bScreenshot = true; }
+static void AntiSnapshot() { g_pGlobals.bSnapshot = true; }
+static void AntiScreenshot() { g_pGlobals.bScreenshot = true; }
+
 void AntiScreen()
 {
 	if (g_pGlobals.bSnapshot || g_pGlobals.bScreenshot)

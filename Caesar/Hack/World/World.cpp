@@ -5,7 +5,7 @@ extern Config config;
 CWorld World;
 CBaseLocal g_Local;
 CBasePlayer g_Player[MAX_CLIENTS + 1];
-CBaseEntity g_Entities[256];
+CBaseEntity g_Entities[MAX_ENTITIES_COUNT];
 hud_player_info_t g_PlayerInfoList[MAX_CLIENTS + 1];
 player_extra_info_t g_PlayerExtraInfoList[MAX_CLIENTS + 1];
 info_map_parameters g_MapInfo;
@@ -21,7 +21,7 @@ void MyVectorTransform(Vector in1, float in2[3][4], float *out, int xyz, float m
 
 void CWorld::GetHitboxes(struct cl_entity_s *ent)
 {
-	if (g_Utils.IsPlayer(ent) && ent->index != g_Local.iIndex) 
+	if (g_Utils.IsPlayer(ent) && ent->index != g_Local.iIndex)
 	{
 		Vector vBBMin, vBBMax, vTransform, vMultiPoint;
 
@@ -72,7 +72,7 @@ void CWorld::GetHitboxes(struct cl_entity_s *ent)
 			MyVectorTransform(pHitbox[i].bbmin, (*pBoneMatrix)[pHitbox[i].bone], vTransform, 2, vMultiPoint[2]);
 			g_PlayerExtraInfoList[ent->index].vHitboxPoints[i][7] = vTransform + g_Player[ent->index].vVelocity * g_Player[ent->index].flFrametime;
 
-			
+
 		}
 	}
 }
@@ -151,7 +151,7 @@ void CWorld::UpdateEntities()
 	float m_flBestDist = 64;
 	unsigned int m_ResolvedEntities[MAX_CLIENTS + 1] = { 0 };
 
-	for (unsigned int i = MAX_CLIENTS + 1; i < 256; i++)
+	for (unsigned int i = MAX_CLIENTS + 1; i < MAX_ENTITIES_COUNT; i++)
 	{
 		cl_entity_s *ent = g_Engine.GetEntityByIndex(i);
 
@@ -227,7 +227,7 @@ void CWorld::UpdateEntities()
 			m_iVictims++;
 		}
 
-		if (m_iVictims > 0) 
+		if (m_iVictims > 0)
 		{
 			for (int i = 1; i <= g_Engine.GetMaxClients(); i++)
 			{
@@ -258,7 +258,7 @@ void CWorld::UpdateEntities()
 
 			unsigned int ent = m_ResolvedEntities[i];
 
-			if (ent > 0 && ent < 256) 
+			if (ent > 0 && ent < 256)
 				g_Entities[ent].iResolvedIndex = i;
 		}
 	}
@@ -356,7 +356,7 @@ void CWorld::UpdateVisibility(int id)
 
 	std::deque<unsigned int> Hitboxes;
 
-	if (IsCurWeaponGun()) 
+	if (IsCurWeaponGun())
 	{
 		if (config.aimbot.enabled)//Rage aimbot
 		{
@@ -501,9 +501,9 @@ void CWorld::UpdateVisibility(int id)
 			{
 				g_Engine.pEventAPI->EV_SetTraceHull(2);
 
-				if (config.bypass_trace_blockers) 
+				if (config.bypass_trace_blockers)
 					g_Engine.pEventAPI->EV_PlayerTrace(g_Local.vEye, g_PlayerExtraInfoList[id].vHitboxPoints[hitbox][point], PM_WORLD_ONLY, -1, &tr);
-				else 
+				else
 					g_Engine.pEventAPI->EV_PlayerTrace(g_Local.vEye, g_PlayerExtraInfoList[id].vHitboxPoints[hitbox][point], PM_GLASS_IGNORE, -1, &tr);
 
 				detect = g_Engine.pEventAPI->EV_IndexFromTrace(&tr);
@@ -557,7 +557,7 @@ void CWorld::ClearPlayers()
 
 void CWorld::ClearEntities()
 {
-	memset(g_Entities, NULL, sizeof(CBaseEntity));
+	memset(g_Entities, NULL, sizeof(g_Entities));
 }
 
 void CWorld::ClearMapInfo()
@@ -589,18 +589,18 @@ void CWorld::UpdateMapInfo()
 
 		if (g_MapInfo.levelname)
 		{
-			if (!lstrcmpA(g_MapInfo.levelname, "maps/de_dust2.bsp") || 
+			if (!lstrcmpA(g_MapInfo.levelname, "maps/de_dust2.bsp") ||
 				!lstrcmpA(g_MapInfo.levelname, "maps/de_dust2_2x2.bsp") ||
-				!lstrcmpA(g_MapInfo.levelname, "maps/de_inferno.bsp") || 
+				!lstrcmpA(g_MapInfo.levelname, "maps/de_inferno.bsp") ||
 				!lstrcmpA(g_MapInfo.levelname, "maps/de_inferno_2x2.bsp") ||
-				!lstrcmpA(g_MapInfo.levelname, "maps/de_train.bsp") || 
+				!lstrcmpA(g_MapInfo.levelname, "maps/de_train.bsp") ||
 				!lstrcmpA(g_MapInfo.levelname, "maps/de_kabul.bsp") ||
 				!lstrcmpA(g_MapInfo.levelname, "maps/de_mirage.bsp") ||
 				!lstrcmpA(g_MapInfo.levelname, "maps/de_aztec.bsp"))
 			{
 				g_MapInfo.m_flBombRadius = 1750;
 			}
-			else if (!lstrcmpA(g_MapInfo.levelname, "maps/de_dust.bsp")) 
+			else if (!lstrcmpA(g_MapInfo.levelname, "maps/de_dust.bsp"))
 			{
 				g_MapInfo.m_flBombRadius = 350;
 			}

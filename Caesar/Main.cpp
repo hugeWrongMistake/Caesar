@@ -52,8 +52,12 @@ LRESULT CALLBACK Hooked_WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
     return CallWindowProc(g_pGlobals.WndProcBackup, hwnd, uMsg, wParam, lParam);
 }
 
+static int isHooked = 0;
 DWORD WINAPI Hook(LPVOID lpThreadParameter)
 {
+    if (isHooked)
+        return 0;
+    isHooked = 1;
     CreateInterfaceFn gameui_factory = CaptureFactory("gameui.dll");
     CreateInterfaceFn vgui2_factory = CaptureFactory("vgui2.dll");
     CreateInterfaceFn hardware_factory = CaptureFactory("hw.dll");
@@ -130,11 +134,18 @@ DWORD WINAPI Hook(LPVOID lpThreadParameter)
     return NULL;
 }
 
+char ThisModuleFileName[MAX_PATH];
 BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD dwReason, LPVOID lpReserved)
 {
     if (dwReason == DLL_PROCESS_ATTACH)
     {
         DisableThreadLibraryCalls(hinstDLL);
+        {
+            // Prevent dll from being unloaded and causing child thread errors
+            HMODULE hm2;
+            GetModuleFileNameA(hinstDLL, ThisModuleFileName, sizeof(ThisModuleFileName));
+            GetModuleHandleExA(GET_MODULE_HANDLE_EX_FLAG_PIN, ThisModuleFileName, &hm2);
+        }
 
         GetModuleFileNameA(NULL, g_pGlobals.GamePath, MAX_PATH);
 

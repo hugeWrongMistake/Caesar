@@ -101,6 +101,8 @@ public:
 
 	Vector vOrigin;
 };
-extern CBaseEntity g_Entities[256];
+
+#define MAX_ENTITIES_COUNT 2048
+extern CBaseEntity g_Entities[MAX_ENTITIES_COUNT];
 
 extern info_map_parameters g_MapInfo;

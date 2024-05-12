@@ -117,7 +117,7 @@ bool CUtils::IsEntityAlive(struct cl_entity_s *ent)
     if (g_Local.iIndex == ent->index)
         return false;
 
-    if (ent->index > 256 || ent->index < 0)
+    if (ent->index > MAX_ENTITIES_COUNT || ent->index < 0)
         return false;
 
     cl_entity_s *pLocal = g_Engine.GetLocalPlayer();

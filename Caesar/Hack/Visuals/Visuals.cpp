@@ -12,7 +12,7 @@ CVisuals g_Visuals;
 struct {
     std::deque<Vector> vPoints;
     DWORD dwUpdated;
-} Grenades[256];
+} Grenades[MAX_ENTITIES_COUNT];
 
 void CVisuals::IconInit()
 {
@@ -1111,7 +1111,7 @@ void CVisuals::DrawFake(int PlayerID, int EntityID)
 
 void CVisuals::DrawEntities()
 {
-    for (unsigned int i = MAX_CLIENTS + 1; i < 256; i++)
+    for (unsigned int i = MAX_CLIENTS + 1; i < MAX_ENTITIES_COUNT; i++)
     {
         if (!g_Entities[i].bUpdated)
         {
