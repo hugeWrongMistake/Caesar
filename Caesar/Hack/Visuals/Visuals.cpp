@@ -1220,7 +1220,17 @@ void CVisuals::DrawEntities()
                         }
                         else {
                         default_draw_weapon:
-                            g_Drawing.DrawString(ESP, flScreen[0], flScreen[1], config.esp_world_weapon_r, config.esp_world_weapon_g, config.esp_world_weapon_b, config.esp_alpha, FONT_CENTER, "%s", szWeapon);
+                            float color_r = config.esp_world_weapon_r;
+                            float color_g = config.esp_world_weapon_g;
+                            float color_b = config.esp_world_weapon_b;
+
+                            if (0 == strcmp(szWeapon, "backpack"))
+                            {
+                                color_r = config.esp_bomb_r;
+                                color_g = config.esp_bomb_g;
+                                color_b = config.esp_bomb_b;
+                            }
+                            g_Drawing.DrawString(ESP, flScreen[0], flScreen[1], color_r, color_g, color_b, config.esp_alpha, FONT_CENTER, "%s", szWeapon);
                         }
                     }
                 }
