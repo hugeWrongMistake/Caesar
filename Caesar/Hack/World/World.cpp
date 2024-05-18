@@ -170,8 +170,7 @@ void CWorld::UpdateEntities()
 
 		if (ent->model && ent->model->name)
 		{
-			g_Entities[i].szModelName = new char[strlen(ent->model->name) + 1];
-			strcpy(g_Entities[i].szModelName, ent->model->name);
+			g_Entities[i].szModelName = ent->model->name;
 		}
 		else
 			g_Entities[i].szModelName = "null";
