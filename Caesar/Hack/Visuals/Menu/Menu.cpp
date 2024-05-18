@@ -2,6 +2,9 @@
 #include "../../../images.h"
 #include "../../../Config.h"
 
+
+#pragma warning(disable:4018)
+
 extern Config config;
 CMenu g_Menu;
 
@@ -634,7 +637,7 @@ void CMenu::Tabs()
 		int box_indent_x = 10;
 		int box_indent_y = 15;
 
-		int save[256];
+		// int save[256];
 
 		int line_y = 15;
 
@@ -978,7 +981,7 @@ void CMenu::Tabs()
 		int box_indent_x = 10;
 		int box_indent_y = 15;
 
-		int save[256];
+		//int save[256];
 
 		int line_y = 15;
 
@@ -994,7 +997,7 @@ void CMenu::Tabs()
 			if (max > 16)
 				max = 16;
 
-			for (int j = 1; j <= max; j++)
+			for (unsigned int j = 1; j <= max; j++)
 			{
 				if (j == g_Local.iIndex)
 					continue;
