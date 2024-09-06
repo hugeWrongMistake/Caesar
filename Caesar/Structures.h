@@ -238,12 +238,16 @@ struct player_extra_info_t
 	Vector vHitbox[21];
 	Vector vHitboxMin[21];
 	Vector vHitboxMax[21];
-	Vector vHitboxPoints[21][8];
+	Vector vHitboxPoints[21][9];
 
 	bool bHitboxVisible[21];
-	bool bHitboxPointsVisible[21][8];
+	bool bHitboxPointsVisible[21][9];
 	bool bHitboxBehindTheWall[21];
-	bool bHitboxPointsBehindTheWall[21][8];
+	bool bHitboxPointsBehindTheWall[21][9];
+
+	int iHitboxPointsPredictedDamage[21][9];
+	int iBestDamage;
+	Vector vBestDamagePoint;
 
 	float fHitboxFOV[21];
 };

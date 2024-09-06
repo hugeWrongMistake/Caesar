@@ -9,6 +9,11 @@ SCREENINFO g_Screen;
 static void AntiSnapshot() { g_pGlobals.bSnapshot = true; }
 static void AntiScreenshot() { g_pGlobals.bScreenshot = true; }
 
+static void testFun()
+{
+	g_Local;
+}
+
 void AntiScreen()
 {
 	if (g_pGlobals.bSnapshot || g_pGlobals.bScreenshot)

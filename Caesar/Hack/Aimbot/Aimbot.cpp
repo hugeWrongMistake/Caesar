@@ -303,7 +303,7 @@ void CAimBot::LegitAimbot(struct usercmd_s *cmd)
 
 		QAngle QMyAngles, QAimAngles, QNewAngles, QSmoothAngles;
 
-		Vector vAimOrigin = g_PlayerExtraInfoList[iTarget].vHitbox[iHitbox];
+		Vector vAimOrigin = g_PlayerExtraInfoList[iTarget].vBestDamagePoint;
 
 		g_Engine.GetViewAngles(QMyAngles);
 
@@ -616,12 +616,7 @@ void CAimBot::RageAimbot(struct usercmd_s *cmd)
 		{
 			QAngle QMyAngles, QAimAngles, QSmoothAngles;
 
-			Vector vAimOrigin;
-
-			if(m_iPoint >= 0 && m_iPoint < 8)
-				vAimOrigin = g_PlayerExtraInfoList[m_iTarget].vHitboxPoints[m_iHitbox][m_iPoint];
-			else
-				vAimOrigin = g_PlayerExtraInfoList[m_iTarget].vHitbox[m_iHitbox];
+			Vector vAimOrigin = g_PlayerExtraInfoList[m_iTarget].vBestDamagePoint;
 
 			g_Engine.GetViewAngles(QMyAngles);
 

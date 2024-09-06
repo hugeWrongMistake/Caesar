@@ -10,6 +10,39 @@ hud_player_info_t g_PlayerInfoList[MAX_CLIENTS + 1];
 player_extra_info_t g_PlayerExtraInfoList[MAX_CLIENTS + 1];
 info_map_parameters g_MapInfo;
 
+/*
+* Hitbox Multipliers
+* Location	Damage
+* Head	400%
+* Chest & arm	100%
+* Stomach and pelvis	125%
+* Leg	75%
+*/
+
+const float dicHitboxDamageMultiplier[32] = {
+	1.25f,  // 0 pelvis
+	0.75f,  // 1 leg
+	0.75f,  // 2 leg
+	0.75f,  // 3 leg
+	0.75f,  // 4 leg
+	0.75f,  // 5 leg
+	0.75f,  // 6 leg
+	1.0f,  // 7 chest
+	1.0f,  // 8 chest
+	1.0f,  // 9 chest
+	1.0f,  // 10 chest
+	4.0f,  // 11 head
+	1.0f,  // 12 chest
+	1.0f,  // 13 arm
+	1.0f,  // 14 arm
+	1.0f,  // 15 arm
+	1.25f,  // 16 stomach
+	1.0f,  // 17 arm
+	1.0f,  // 18 arm
+	1.0f,  // 19 arm
+	0  // 20 shield
+};
+
 void MyVectorTransform(Vector in1, float in2[3][4], float *out, int xyz, float multi)
 {
 	in1[xyz] *= multi;
@@ -72,7 +105,12 @@ void CWorld::GetHitboxes(struct cl_entity_s *ent)
 			MyVectorTransform(pHitbox[i].bbmin, (*pBoneMatrix)[pHitbox[i].bone], vTransform, 2, vMultiPoint[2]);
 			g_PlayerExtraInfoList[ent->index].vHitboxPoints[i][7] = vTransform + g_Player[ent->index].vVelocity * g_Player[ent->index].flFrametime;
 
-
+			g_PlayerExtraInfoList[ent->index].vHitboxPoints[i][8] = g_PlayerExtraInfoList[ent->index].vHitbox[i];
+			for (int point = 0; point < 8; point++)
+			{
+				g_PlayerExtraInfoList[ent->index].vHitboxPoints[i][point] = g_PlayerExtraInfoList[ent->index].vHitbox[i] +
+					(g_PlayerExtraInfoList[ent->index].vHitboxPoints[i][point] - g_PlayerExtraInfoList[ent->index].vHitbox[i]) * 0.92f;
+			}
 		}
 	}
 }
@@ -445,6 +483,7 @@ void CWorld::UpdateVisibility(int id)
 
 	pmtrace_t tr;
 	int detect = 0;
+	int iBestDamage = -1;
 
 	for (auto &&hitbox : Hitboxes)
 	{
@@ -457,7 +496,7 @@ void CWorld::UpdateVisibility(int id)
 
 		detect = g_Engine.pEventAPI->EV_IndexFromTrace(&tr);
 
-		if ((config.bypass_trace_blockers && tr.fraction == 1 && !detect) || (!config.bypass_trace_blockers && detect == id))
+		if ((config.bypass_trace_blockers && tr.fraction > 0.99f && !detect) || (!config.bypass_trace_blockers && detect == id))
 		{
 			g_Player[id].bVisible = true;
 			g_Player[id].bBehindTheWall = false;
@@ -509,6 +548,7 @@ void CWorld::UpdateVisibility(int id)
 
 				if ((config.bypass_trace_blockers && tr.fraction == 1 && !detect) || (!config.bypass_trace_blockers && detect == id))
 				{
+					g_PlayerExtraInfoList[id].iHitboxPointsPredictedDamage[hitbox][point] = CurDamage() * dicHitboxDamageMultiplier[hitbox];
 					g_Player[id].bVisible = true;
 					g_Player[id].bBehindTheWall = false;
 					g_PlayerExtraInfoList[id].bHitboxPointsVisible[hitbox][point] = true;
@@ -534,8 +574,22 @@ void CWorld::UpdateVisibility(int id)
 							g_Player[id].bVisible = true;
 							g_PlayerExtraInfoList[id].bHitboxPointsVisible[hitbox][point] = true;
 							g_PlayerExtraInfoList[id].bHitboxPointsBehindTheWall[hitbox][point] = true;
+							g_PlayerExtraInfoList[id].iHitboxPointsPredictedDamage[hitbox][point] = iCurrentDamage * dicHitboxDamageMultiplier[hitbox];
 						}
+						else
+							goto defalut_zero_damage;
 					}
+					else {
+						defalut_zero_damage:
+						g_PlayerExtraInfoList[id].iHitboxPointsPredictedDamage[hitbox][point] = 0;
+					}
+				}
+				int damage = g_PlayerExtraInfoList[id].iHitboxPointsPredictedDamage[hitbox][point];
+				if (damage >= iBestDamage)
+				{
+					iBestDamage = damage;
+					g_PlayerExtraInfoList[id].iBestDamage = iBestDamage;
+					g_PlayerExtraInfoList[id].vBestDamagePoint = g_PlayerExtraInfoList[id].vHitboxPoints[hitbox][point];
 				}
 			}
 		}

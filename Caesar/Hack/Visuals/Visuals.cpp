@@ -687,6 +687,12 @@ void CVisuals::PlayerESP(unsigned int i)
                 g_Drawing.DrawString(ESP, ScreenTop[0] - box_width + indent, box_height + y + ScreenTop[1], 255, 255, 255, config.esp_alpha, FONT_LEFT, "Y: %.3f", g_Player[i].vAngles[1]);
                 y += 12;
             }
+            if (g_Player[i].bVisible) {
+                float screenPoint[2];
+                g_Utils.bCalcScreen(g_PlayerExtraInfoList[i].vBestDamagePoint, screenPoint);
+                g_Drawing.DrawString(ESP, screenPoint[0] + 8, screenPoint[1], 255, 255, 255, 255, FONT_LEFT, "%d/%d", g_PlayerExtraInfoList[i].iBestDamage, CurDamage());
+                g_Drawing.DrawString(ESP, screenPoint[0], screenPoint[1], 255, 0, 0, 255, FONT_CENTER, "X");
+            }
         }
         else {
             if (config.esp_shots_fired) {
@@ -904,6 +910,7 @@ float GetAmountOfPlayerVisible(Vector vecSrc, cl_entity_s *entity)
         return retval;
 
     pmtrace_t tr;
+    constexpr int traceFlags = (PM_GLASS_IGNORE | PM_STUDIO_BOX);
 
     constexpr float topOfHead = 25.0f;
     constexpr float standFeet = 34.0f;
@@ -919,7 +926,7 @@ float GetAmountOfPlayerVisible(Vector vecSrc, cl_entity_s *entity)
     // check chest
     Vector vecChest = entity->origin;
     g_Engine.pEventAPI->EV_SetTraceHull(2);
-    g_Engine.pEventAPI->EV_PlayerTrace(vecSrc, vecChest, 0, -1, &tr);
+    g_Engine.pEventAPI->EV_PlayerTrace(vecSrc, vecChest, traceFlags, -1, &tr);
 
     if (tr.fraction == 1.0f)
         retval += damagePercentageChest;
@@ -927,7 +934,7 @@ float GetAmountOfPlayerVisible(Vector vecSrc, cl_entity_s *entity)
     // check top of head
     Vector vecHead = entity->origin + Vector(0, 0, topOfHead);
     g_Engine.pEventAPI->EV_SetTraceHull(2);
-    g_Engine.pEventAPI->EV_PlayerTrace(vecSrc, vecHead, 0, -1, &tr);
+    g_Engine.pEventAPI->EV_PlayerTrace(vecSrc, vecHead, traceFlags, -1, &tr);
 
     if (tr.fraction == 1.0f)
         retval += damagePercentageHead;
@@ -938,7 +945,7 @@ float GetAmountOfPlayerVisible(Vector vecSrc, cl_entity_s *entity)
     vecFeet.z -= (ducked) ? crouchFeet : standFeet;
 
     g_Engine.pEventAPI->EV_SetTraceHull(2);
-    g_Engine.pEventAPI->EV_PlayerTrace(vecSrc, vecFeet, 0, -1, &tr);
+    g_Engine.pEventAPI->EV_PlayerTrace(vecSrc, vecFeet, traceFlags, -1, &tr);
 
     if (tr.fraction == 1.0f)
         retval += damagePercentageFeet;
@@ -956,14 +963,14 @@ float GetAmountOfPlayerVisible(Vector vecSrc, cl_entity_s *entity)
 
     // check right "edge"
     g_Engine.pEventAPI->EV_SetTraceHull(2);
-    g_Engine.pEventAPI->EV_PlayerTrace(vecSrc, vecRightSide, 0, -1, &tr);
+    g_Engine.pEventAPI->EV_PlayerTrace(vecSrc, vecRightSide, traceFlags, -1, &tr);
 
     if (tr.fraction == 1.0f)
         retval += damagePercentageRightSide;
 
     // check left "edge"
     g_Engine.pEventAPI->EV_SetTraceHull(2);
-    g_Engine.pEventAPI->EV_PlayerTrace(vecSrc, vecLeftSide, 0, -1, &tr);
+    g_Engine.pEventAPI->EV_PlayerTrace(vecSrc, vecLeftSide, traceFlags, -1, &tr);
 
     if (tr.fraction == 1.0f)
         retval += damagePercentageLeftSide;

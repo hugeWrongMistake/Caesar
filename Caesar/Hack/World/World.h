@@ -106,3 +106,5 @@ public:
 extern CBaseEntity g_Entities[MAX_ENTITIES_COUNT];
 
 extern info_map_parameters g_MapInfo;
+
+extern const float dicHitboxDamageMultiplier[32];
