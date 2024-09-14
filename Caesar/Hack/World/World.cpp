@@ -560,7 +560,7 @@ void CWorld::UpdateVisibility(int id)
 
 					int iOriginalPenetration = CurPenetration();
 
-					if (iOriginalPenetration && walls)
+					if (walls)
 					{
 						int iDamage = CurDamage();
 						int iBulletType = CurBulletType();
